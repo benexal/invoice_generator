@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        body {
+        background: #ccc;
+        padding: 30px;
+        font-size: 0.6em;
+        }
+
+        h6{font-size:1em;}
+
+        .container {
+        width: 21cm;
+        min-height: 29.7cm;
+        }
+
+        .invoice {
+        background: #fff;
+        width: 100%;
+        padding: 50px;
+        }
+
+        .logo {
+        width: 4cm;
+        }
+
+        .document-type {
+        text-align: right;
+        color: #444;
+        }
+
+        .conditions {
+        font-size: 0.7em;
+        color: #666;
+        }
+
+        .bottom-page {
+        font-size: 0.7em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="invoice">
+        <div class="row">
+            <div class="col-7">
+                <img src="http://mysam.fr/wp-content/uploads/2016/06/logo_facture.jpg" class="logo" alt="Logo MySam"/>
+            </div>
+            <div class="col-5">
+                <h1 class="document-type display-4">FACTURE</h1>
+                <p class="text-right"><strong>Référence facture</strong></p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-7">
+                <p class="addressMySam">
+                    <strong>MYSAM</strong><br/>
+                    8 avenue de la Martelle<br/>
+                    81150 Terssac
+                </p>
+            </div>
+            <div class="col-5">
+                <br/><br/><br/>
+                <p class="addressDriver">
+                    <strong>Société VTC</strong><br/>
+                    Réf. Client <em>Référence client</em><br/>
+                    Prénom NOM<br/>
+                    adresse<br/>
+                    code postal VILLE
+                </p>
+            </div>
+        </div>
+
+        <br/><br/>
+        <h6>Frais de services MYSAM du date au date</h6>
+        <br/>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>TVA</th>
+                    <th class="text-right">Total HT</th>
+                    <th class="text-right">Total TTC</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Frais de service MySam à 5% pour la période du date au date</td>
+                    <td>20%</td>
+                    <td class="text-right">0,00€</td>
+                    <td class="text-right">0,00€</td>
+                </tr>
+                <tr>
+                    <td>Frais de service MySam à 10% pour la période du date au date</td>
+                    <td>20%</td>
+                    <td class="text-right">0,00€</td>
+                    <td class="text-right">0,00€</td>
+                </tr>
+                <tr>
+                    <td>Pénalités d'annulation</td>
+                    <td>20%</td>
+                    <td class="text-right">0,00€</td>
+                    <td class="text-right">0,00€</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="row">
+            <div class="col-8"></div>
+            <div class="col-4">
+                <table class="table table-sm text-right">
+                    <tr>
+                        <td><strong>Total HT</strong></td>
+                        <td class="text-right">0,00€</td>
+                    </tr>
+                    <tr>
+                        <td>TVA 20%</td>
+                        <td class="text-right">0,00€</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total TTC</strong></td>
+                        <td class="text-right">0,00€</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <p class="conditions">
+            En votre aimable règlement<br/>
+            Et avec nos remerciements.<br/><br/>
+            Conditions de paiement : paiement à réception de facture.<br/>
+            Aucun escompte consenti pour règlement anticipé.<br/>
+            Règlement par virement bancaire ou carte bancaire.<br/><br/>
+            En cas de retard de paiement, indemnité forfaitaire pour frais de recouvrement : 40 euros (art. L.4413 et L.4416 code du commerce).
+        </p>
+
+        <br/><br/><br/><br/>
+
+        <p class="bottom-page text-right">
+            MYSAM SAS - N° SIRET 81754802700017 RCS ALBI<br/>
+            8, avenue de la Martelle - 81150 TERSSAC 06 32 97 00 22 - www.mysam.fr<br/>
+            Code APE 6312Z - N° TVA Intracom. FR 63 817548027<br/>
+        </p>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+// Gestion du clic sur le bouton "Générer une facture"
+     $('#generate-invoice').click(function () {
+         var invoiceData = getInvoiceData();
+ 
+         // Vérification : le tableau items ne doit pas être vide
+         if (invoiceData.items.length === 0) {
+             alert('Veuillez ajouter au moins un produit à la facture.');
+             return; // Arrête l'exécution si la condition n'est pas remplie
+         }
+ 
+         // Vérification : le total ne doit pas être 0
+         if (invoiceData.total === 0) {
+             alert('Le total de la facture ne peut pas être 0.');
+             return; // Arrête l'exécution si la condition n'est pas remplie
+         }
+ 
+         // Vérification : un client doit être sélectionné
+         if (!invoiceData.client) {
+             alert('Veuillez sélectionner un client.');
+             return; // Arrête l'exécution si la condition n'est pas remplie
+         }
+ 
+         // Afficher les données dans la console pour vérification
+         console.log(invoiceData);
+ 
+         // Envoyer les données au backend via AJAX
+         $.ajax({
+             url: '{% url "generate_invoice" %}', // Remplacez par l'URL correcte pour générer la facture
+             method: 'POST',
+             contentType: 'application/json',
+             data: JSON.stringify(invoiceData),
+             success: function (response) {
+                 // Traitez la réponse du backend
+                 if (response.facture_id) {
+                     alert('Facture générée avec succès ! ID de la facture : ' + response.facture_id);
+                     // Vous pouvez rediriger vers une autre page si nécessaire
+                     // window.location.href = '/factures/';
+                 }
+             },
+             error: function (xhr, status, error) {
+                 // Gérer les erreurs
+                 var errorMessage = 'Une erreur est survenue lors de la génération de la facture. Veuillez réessayer.';
+                 try {
+                     var response = JSON.parse(xhr.responseText);
+                     if (response.error) {
+                         errorMessage = response.error;
+                     }
+                 } catch (e) {
+                     // Si la réponse n'est pas au format JSON ou si le parsing échoue
+                     console.error('Erreur lors du parsing de la réponse JSON:', e);
+                 }
+                 alert(errorMessage);
+                 console.error('Erreur lors de la génération de la facture:', error);
+             }
+         });
+     });
+ 
+
+</body>
+</html>

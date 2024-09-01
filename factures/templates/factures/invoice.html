@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Facture n° {{ facture.id }}</title>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <style>
+        body {
+            background: #ccc;
+            padding: 30px;
+            font-size: 0.6em;
+        }
+
+        h6 {
+            font-size: 1em;
+        }
+
+        .container {
+            width: 21cm;
+            min-height: 29.7cm;
+        }
+
+        .invoice {
+            background: #fff;
+            width: 100%;
+            padding: 50px;
+        }
+
+        .logo {
+            width: 4cm;
+        }
+
+        .document-type {
+            text-align: right;
+            color: #444;
+        }
+
+        .conditions {
+            font-size: 0.7em;
+            color: #666;
+        }
+
+        .bottom-page {
+            font-size: 0.7em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="invoice">
+            <div class="row">
+               
+                <div class="col-5">
+                    <h1 class="document-type display-4">FACTURE</h1>
+                    <p class="text-right"><strong>Référence facture : {{ facture.id }}</strong></p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-7">
+                    <p class="addressMySam">
+                        <strong>BENEXAL</strong><br/>
+                        Lomé<br/>
+                        Adidogomé
+                    </p>
+                </div>
+                <div class="col-5">
+                    <p class="addressDriver">
+                        <strong>{{ client.nom }} {{ client.prenom }}</strong><br/>
+                        Réf. Client <em>{{ client.id }}</em><br/>
+                        {{ client.adresse }}<br/>
+                        {{ client.code_postal }} {{ client.ville }}
+                    </p>
+                </div>
+            </div>
+            <br/>
+            <h6>Produits Facturés</h6>
+            <br/>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Quantité</th>
+                    <th>Prix Unitaire</th>
+                    <th>TVA</th>
+                    <th class="text-right">Total HT</th>
+                    <th class="text-right">Total TTC</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.produit.nom }}</td>
+                    <td>{{ item.quantite }}</td>
+                    <td>{{ item.prix_unitaire }} f</td>
+                    <td>{{ item.produit.tva }}%</td>
+                    <td class="text-right">{{ item.montant_ht }} f</td>
+                    <td class="text-right">{{ item.montant_ttc }} f</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="row">
+                <div class="col-8"></div>
+                <div class="col-4">
+                    <table class="table table-sm text-right">
+                        <tr>
+                            <td><strong>Total HT</strong></td>
+                            <td class="text-right">{{ total_ht }} f</td>
+                        </tr>
+                        <tr>
+                            <td>TVA 20%</td>
+                            <td class="text-right">{{ total_tva }} f</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total TTC</strong></td>
+                            <td class="text-right">{{ total_ttc }} f</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+        
+           
+        </div>
+    </div>
+</body>
+</html>

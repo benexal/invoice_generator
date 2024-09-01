@@ -1,0 +1,64 @@
+{% extends 'factures/base.html' %}
+
+
+{% block content %}
+<!-- Contenu de la page -->
+
+
+<div class="card-body bg-white">
+    <div class="container mt-4">
+        <h1 class="mb-4">Créer une Facture</h1>
+        <form id="invoice-form" method="post">
+            {% csrf_token %}
+            <div class="form-row mb-4">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="client">Client</label>
+                        <select id="client" name="client" class="form-control" required>
+                            <option value="">Sélectionnez un client</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <table id="items-table">
+                <thead>
+                    <tr>
+                        <th>Catégorie</th>
+                        <th>Produit</th>
+                        <th>Quantité</th>
+                        <th>Prix Unitaire</th>
+                        <th>TVA (%)</th>
+                        <th>Prix Total</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="items-container">
+
+                </tbody>
+            </table>
+
+            <button type="button" id="add-item" class="btn btn-primary mb-4">Ajouter une ligne</button>
+
+            <div class="form-row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="total">Total</label>
+                        <input type="text" id="total" name="total" class="form-control" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group d-flex justify-content-between">
+                <button type="submit" id="payer" class="btn btn-success">Payer</button>
+                <button type="button" class="btn btn-primary" id="generate-invoice">Générer la facture</button>
+            </div>
+        </form>
+    </div>
+
+    
+   
+    
+</div>
+
+{% endblock %}

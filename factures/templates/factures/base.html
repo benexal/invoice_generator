@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+
+
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="{% static 'favicon.ico' %}">
+    <title>Facturation - Créer une Facture</title>
+    <!-- Simple bar CSS -->
+    <link rel="stylesheet" href="{% static 'css/simplebar.css' %}">
+    <!-- Fonts CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Overpass:wght@100;200;300;400;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+        rel="stylesheet">
+    <!-- Icons CSS -->
+    <link rel="stylesheet" href="{% static 'css/feather.css' %}">
+    <!-- Date Range Picker CSS -->
+    <link rel="stylesheet" href="{% static 'css/daterangepicker.css' %}">
+    <!-- App CSS -->
+    <link rel="stylesheet" href="{% static 'css/app-light.css' %}" id="lightTheme">
+    <link rel="stylesheet" href="{% static 'css/app-dark.css' %}" id="darkTheme" disabled>
+    <style>
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .item-row {
+            border: 1px solid #ddd;
+            border-radius: .25rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .remove-item {
+            margin-top: 1rem;
+        }
+
+        .item-row .form-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .item-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .item-row .btn {
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 1rem;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            text-align: left;
+            background-color: #f8f9fa;
+        }
+
+
+        .form-group {
+        margin-top: 20px;
+        }
+
+        .btn {
+            min-width: 100px; 
+        }
+
+    </style>
+</head>
+<body class="vertical light">
+    <div class="wrapper">
+
+
+
+
+        <nav class="topnav navbar navbar-light">
+            <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
+              <i class="fe fe-menu navbar-toggler-icon"></i>
+            </button>
+            <form class="form-inline mr-auto searchform text-muted">
+              <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" type="search" placeholder="Type something..." aria-label="Search">
+            </form>
+            <ul class="nav">
+              <li class="nav-item">
+                <a class="nav-link text-muted my-2" href="#" id="modeSwitcher" data-mode="light">
+                  <i class="fe fe-sun fe-16"></i>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-shortcut">
+                  <span class="fe fe-grid fe-16"></span>
+                </a>
+              </li>
+              <li class="nav-item nav-notif">
+                <a class="nav-link text-muted my-2" href="./#" data-toggle="modal" data-target=".modal-notif">
+                  <span class="fe fe-bell fe-16"></span>
+                  <span class="dot dot-md bg-success"></span>
+                </a>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="avatar avatar-sm mt-2">
+                    <img src="./assets/avatars/face-1.jpg" alt="..." class="avatar-img rounded-circle">
+                  </span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="#">Profile</a>
+                  <a class="dropdown-item" href="#">Settings</a>
+                  <a class="dropdown-item" href="#">Activities</a>
+                </div>
+              </li>
+            </ul>
+          </nav>
+          <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
+            <a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
+              <i class="fe fe-x"><span class="sr-only"></span></i>
+            </a>
+            <nav class="vertnav navbar navbar-light">
+              <!-- nav bar -->
+              <div class="w-100 mb-4 d-flex">
+                <a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="./index.html">
+                  <svg version="1.1" id="logo" class="navbar-brand-img brand-sm" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 120 120" xml:space="preserve">
+                    <g>
+                      <polygon class="st0" points="78,105 15,105 24,87 87,87 	" />
+                      <polygon class="st0" points="96,69 33,69 42,51 105,51 	" />
+                      <polygon class="st0" points="78,33 15,33 24,15 87,15 	" />
+                    </g>
+                  </svg>
+                </a>
+              </div>
+              <ul class="navbar-nav flex-fill w-100 mb-2">
+                <li class="nav-item dropdown">
+                  <a href="#dashboard" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+                    <i class="fe fe-home fe-16"></i>
+                    <span class="ml-3 item-text">Facture</span><span class="sr-only">(current)</span>
+                  </a>
+                  <ul class="collapse list-unstyled pl-4 w-100" id="dashboard">
+                    <li class="nav-item active">
+                        <a class="nav-link pl-3" href="{% url 'index' %}"><span class="ml-1 item-text">Créer une facture</span></a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link pl-3" href="{% url 'list_invoice' %}"><span class="ml-1 item-text">Voir la liste des factures</span></a>
+                    </li>
+                    
+                    
+                  </ul>
+                </li>
+              </ul>
+             
+             
+             
+              
+             
+             
+              
+              
+            </nav>
+          </aside>
+
+
+
+    <main role="main" class="main-content">      
+        {% block content %}
+        <!-- Contenu principal ici -->
+        {% endblock %}
+    </main> <!-- main -->
+    </div> <!-- .wrapper -->
+
+
+
+
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/moment.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/simplebar.min.js' %}"></script>
+    <script src="{% static 'js/daterangepicker.js' %}"></script>
+    <script src="{% static 'js/jquery.stickOnScroll.js' %}"></script>
+    <script src="{% static 'js/tinycolor-min.js' %}"></script>
+    <script src="{% static 'js/config.js' %}"></script>
+    <script src="{% static 'js/apps.js' %}"></script>
+
+    <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'js/dataTables.bootstrap4.min.js' %}"></script>
+
+
+
+
+    <script>
+       
+
+        $(document).ready(function () {
+ 
+ 
+ 
+ 
+ 
+         // Ajouter une nouvelle ligne de produit
+         $('#add-item').click(function () {
+             $('#items-container').append(`
+                 <tr class="item-row">
+                     <td>
+                         <select class="form-control category" name="categories[]" required>
+                             <option value="">Sélectionnez une catégorie</option>
+                         </select>
+                     </td>
+                     <td>
+                         <select class="form-control product" name="products[]" required>
+                             <option value="">Sélectionnez un produit</option>
+                         </select>
+                     </td>
+                     <td>
+                         <input type="number" class="form-control quantity" name="quantities[]" min="1" required>
+                     </td>
+                     <td>
+                         <input type="number" class="form-control price" name="prices[]" step="0.01" min="0" readonly>
+                     </td>
+                     <td>
+                         <input type="number" class="form-control tva" name="tvas[]" step="0.01" min="0" readonly>
+                     </td>
+                     <td>
+                         <input type="number" class="form-control total" name="totals[]" step="0.01" min="0" readonly>
+                     </td>
+                     <td>
+                         <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+                     </td>
+                 </tr>
+             `);
+ 
+             // Charger les catégories pour la nouvelle ligne
+             loadCategories($('#items-container').find('.category').last());
+         });
+ 
+         // Supprimer une ligne de produit
+         $('#items-container').on('click', '.remove-item', function () {
+             $(this).closest('.item-row').remove();
+             calculateTotal(); // Recalculer le total global si nécessaire
+             calculateGrandTotal();  // Met à jour le total global
+         });
+ 
+ 
+ 
+ 
+ 
+ 
+         // Charger les clients
+         $.ajax({
+             url: "{% url 'get_clients' %}",
+             method: 'GET',
+             success: function (data) {
+                 var clientSelect = $('#client');
+                 $.each(data.clients, function (index, client) {
+                     clientSelect.append('<option value="' + client.id + '">' + client.nom + ' ' + client.prenom + '</option>');
+                 });
+             }
+         });
+ 
+         // Charger les catégories lors du chargement de la page et à chaque ajout de ligne
+         function loadCategories(categorySelect) {
+             $.ajax({
+                 url: '{% url "get_categories" %}',
+                 success: function (data) {
+                     categorySelect.empty();
+                     categorySelect.append('<option value="">Sélectionnez une catégorie</option>');
+                     $.each(data.categories, function (key, value) {
+                         categorySelect.append('<option value="' + value.id + '">' + value.nom + '</option>');
+                     });
+                 }
+             });
+         }
+ 
+         // Charger les produits en fonction de la catégorie sélectionnée
+         function loadProducts(categorySelect) {
+             var categoryId = categorySelect.val();
+             var productSelect = categorySelect.closest('tr').find('.product');
+ 
+             $.ajax({
+                 url: '{% url "get_products_by_category" %}',
+                 data: {
+                     'category_id': categoryId
+                 },
+                 success: function (data) {
+                    
+                     productSelect.empty();
+                     productSelect.append('<option value="">Sélectionnez un produit</option>');
+                     $.each(data.produits, function (key, value) {
+                         productSelect.append('<option value="' + value.id + '" data-price="' + value.prix + '" data-tva="' + value.tva + '">' + value.nom + '</option>');
+                     });
+                 }
+             });
+         }
+ 
+         // Initialiser les catégories sur la première ligne
+         loadCategories($('.category').first());
+ 
+         // Gérer les changements de catégorie pour les produits existants
+         $(document).on('change', '.category', function () {
+             loadProducts($(this));
+         });
+ 
+         // Mettre à jour le prix unitaire et la TVA lors de la sélection d'un produit
+         $(document).on('change', '.product', function () {
+             var selectedOption = $(this).find('option:selected');
+             var price = selectedOption.data('price');
+             var tva = selectedOption.data('tva');
+             
+             // Afficher les valeurs de price et tva dans la console
+            
+ 
+             var row = $(this).closest('tr');
+             row.find('.price').val(price);
+             row.find('.tva').val(tva);
+ 
+             // Recalculer le total pour cette ligne
+             calculateTotalForRow(row);
+             calculateGrandTotal();  // Met à jour le total global
+         });
+ 
+ 
+         // Recalculer le total lors de la modification de la quantité
+         $(document).on('input', '.quantity', function () {
+             var row = $(this).closest('tr');
+             calculateTotalForRow(row);
+             calculateGrandTotal();  // Met à jour le total global
+         });
+ 
+         // Fonction pour calculer le total pour chaque ligne
+         function calculateTotalForRow(row) {
+             var quantity = parseFloat(row.find('.quantity').val()) || 0;
+             var price = parseFloat(row.find('.price').val()) || 0;
+             var tva = parseFloat(row.find('.tva').val()) || 0;
+ 
+             var total = quantity * price * (1 + tva / 100);
+             row.find('.total').val(total.toFixed(2));
+         }
+ 
+         
+ 
+ 
+         // Fonction pour calculer le total global
+         function calculateGrandTotal() {
+             var grandTotal = 0;
+ 
+             $('#items-container').find('.item-row').each(function () {
+                 var rowTotal = parseFloat($(this).find('.total').val()) || 0;
+                 grandTotal += rowTotal;
+             });
+ 
+             $('#total').val(grandTotal.toFixed(2));
+         }
+ 
+         calculateGrandTotal(); // Initialiser le total global
+ 
+ 
+ 
+ 
+ 
+ 
+         function getInvoiceData() {
+             var invoiceData = {
+                 client: $('#client').val(), // ID du client
+                 items: [], // Liste des produits
+                 total: parseFloat($('#total').val()) || 0 // Total général
+             };
+ 
+             // Récupérer les informations de chaque ligne de produit
+             $('#items-container .item-row').each(function () {
+                 var row = $(this);
+                 var productData = {
+                     produit_id: row.find('.product').val(), // ID du produit
+                     quantite: parseFloat(row.find('.quantity').val()) || 0, // Quantité
+                     prix_unitaire: parseFloat(row.find('.price').val()) || 0, // Prix unitaire
+                     tva: parseFloat(row.find('.tva').val()) || 0, // TVA
+                     total: parseFloat(row.find('.total').val()) || 0 // Total de la ligne
+                 };
+ 
+                 // Ajouter les données du produit à la liste
+                 invoiceData.items.push(productData);
+             });
+ 
+             return invoiceData;
+         }
+ 
+         
+ 
+ 
+ 
+     // Gestion du clic sur le bouton "Générer une facture"
+$('#generate-invoice').click(function () {
+            var invoiceData = getInvoiceData();
+
+            // Vérification : le tableau items ne doit pas être vide
+            if (invoiceData.items.length === 0) {
+                alert('Veuillez ajouter au moins un produit à la facture.');
+                return; // Arrête l'exécution si la condition n'est pas remplie
+            }
+
+            // Vérification : le total ne doit pas être 0
+            if (invoiceData.total === 0) {
+                alert('Le total de la facture ne peut pas être 0.');
+                return; // Arrête l'exécution si la condition n'est pas remplie
+            }
+
+            // Vérification : un client doit être sélectionné
+            if (!invoiceData.client) {
+                alert('Veuillez sélectionner un client.');
+                return; // Arrête l'exécution si la condition n'est pas remplie
+            }
+
+            // Désactiver le bouton pour éviter les clics multiples
+            $('#generate-invoice').prop('disabled', true);
+
+            // Afficher les données dans la console pour vérification
+            console.log(invoiceData);
+
+            // Récupération du token CSRF
+            var csrftoken = getCookie('csrftoken');
+
+            // Envoyer les données au backend via AJAX
+            $.ajax({
+                url: '{% url "generate_invoice" %}', // Remplacez par l'URL correcte pour générer la facture
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(invoiceData),
+                beforeSend: function(xhr, settings) {
+                    xhr.setRequestHeader('X-CSRFToken', csrftoken);
+                    // Optionnel : afficher un indicateur de chargement
+                    $('#loading-indicator').show();
+                },
+                success: function (response) {
+                        if (response.facture_id) {
+                            alert('Facture générée avec succès !');
+                            // Rediriger vers le PDF
+                            window.location.href = response.pdf_url;
+                        }
+                    },
+
+                error: function (xhr, status, error) {
+                    // Gérer les erreurs
+                    var errorMessage = 'Une erreur est survenue lors de la génération de la facture. Veuillez réessayer.';
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        if (response.error) {
+                            errorMessage = response.error;
+                        }
+                    } catch (e) {
+                        // Si la réponse n'est pas au format JSON ou si le parsing échoue
+                        console.error('Erreur lors du parsing de la réponse JSON:', e);
+                    }
+                    alert(errorMessage);
+                    console.error('Erreur lors de la génération de la facture:', error);
+                },
+                complete: function() {
+                    // Réactiver le bouton
+                    $('#generate-invoice').prop('disabled', false);
+                    // Optionnel : masquer l'indicateur de chargement
+                    $('#loading-indicator').hide();
+                }
+            });
+        });
+
+        // Fonction pour obtenir le token CSRF depuis le cookie
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Cette chaîne de cookies commence par le nom que nous voulons
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+
+
+            $('#dataTable-1').DataTable(
+            {
+                autoWidth: true,
+                "lengthMenu": [
+                [16, 32, 64, -1],
+                [16, 32, 64, "All"]
+                ]
+            });
+
+ 
+     });
+
+
+/* 
+     document.getElementById("payer").addEventListener("click", function () {
+     
+    const requestData = {
+        merchant_number: "KPM464581",
+        currency: "xof", // ou usd, eur selon votre besoin
+        name: "Nom du checkout",
+        amount: 1000, // montant en integer
+        checkout_id: checkoutId,
+        return_url: "https://votre_site.com/retour",
+        locale: "fr", // ou en selon votre besoin
+        mode:1
+    };
+
+    fetch('paiements/kprimepay/proxy/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirection vers l'URL de checkout KPrimePay
+            window.location.href = data.checkout_url;
+        } else {
+            console.error("Erreur lors de la génération du checkout :", data);
+        }
+    })
+    .catch(error => {
+        console.error("Erreur lors de l'appel API :", error);
+    });
+}); */
+
+
+
+
+ 
+     </script>
+</body>
+
+</html>

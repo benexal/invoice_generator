@@ -1,0 +1,262 @@
+$(document).ready(function () {
+
+
+
+
+    $.ajax({
+        url: "{% url 'get_clients' %}",
+        method: 'GET',
+        success: function (data) {
+            var clientSelect = $('#client');
+            $.each(data.clients, function (index, client) {
+                clientSelect.append('<option value="' + client.id + '">' + client.nom + ' ' + client.prenom + '</option>');
+            });
+        }
+    });
+
+
+
+
+    // Charger les catégories lors du chargement de la page et à chaque ajout de ligne
+    function loadCategories(categorySelect) {
+        $.ajax({
+            url: '{% url "get_categories" %}',
+            success: function (data) {
+                categorySelect.empty();
+                categorySelect.append('<option value="">Sélectionnez une catégorie</option>');
+                $.each(data.categories, function (key, value) {
+                    categorySelect.append('<option value="' + value.id + '">' + value.nom + '</option>');
+                });
+            }
+        });
+    }
+
+
+
+
+    // Charger les produits en fonction de la catégorie sélectionnée
+
+
+    function loadProducts(categorySelect) {
+        var categoryId = categorySelect.val();
+        var productSelect = categorySelect.closest('tr').find('.product');
+
+        $.ajax({
+            url: '{% url "get_products_by_category" %}',  // Assurez-vous que cette URL renvoie des produits avec leurs prix et TVA
+            data: {
+                'category_id': categoryId
+            },
+            success: function (data) {
+                productSelect.empty();
+                productSelect.append('<option value="">Sélectionnez un produit</option>');
+                $.each(data.produits, function (key, value) {
+                    productSelect.append('<option value="' + value.id + '" data-price="' + value.prix + '" data-tva="' + value.tva + '">' + value.nom + '</option>');
+                });
+            }
+        });
+    }
+    /* function loadProducts(categorySelect) {
+        var categoryId = categorySelect.val();
+        var productSelect = categorySelect.closest('tr').find('.product');
+
+        $.ajax({
+            url: '{% url "get_products_by_category" %}',
+            data: {
+                'category_id': categoryId
+            },
+            success: function (data) {
+                productSelect.empty();
+                productSelect.append('<option value="">Sélectionnez un produit</option>');
+                $.each(data.produits, function (key, value) {
+                    productSelect.append('<option value="' + value.id + '">' + value.nom + '</option>');
+                });
+            }
+        });
+    } */
+
+
+
+    // Initialiser les catégories sur la première ligne
+    loadCategories($('.category').first());
+
+    // Gérer les changements de catégorie pour les produits existants
+    $(document).on('change', '.category', function () {
+        loadProducts($(this));
+    });
+
+
+    // Ajouter une nouvelle ligne de produit
+    $('#add-item').click(function () {
+        $('#items-container').append(`
+    <tr class="item-row">
+        <td>
+            <select class="form-control category" name="categories[]" required>
+                <option value="">Sélectionnez une catégorie</option>
+            </select>
+        </td>
+        <td>
+            <select class="form-control product" name="products[]" required>
+                <option value="">Sélectionnez un produit</option>
+            </select>
+        </td>
+        <td>
+            <input type="number" class="form-control quantity" name="quantities[]" min="1" required>
+        </td>
+        <td>
+            <input type="number" class="form-control price" name="prices[]" step="0.01" min="0" readonly>
+        </td>
+        <td>
+            <input type="number" class="form-control tva" name="tvas[]" step="0.01" min="0" readonly>
+        </td>
+        <td>
+            <input type="number" class="form-control total" name="totals[]" step="0.01" min="0" readonly>
+        </td>
+        <td>
+            <button type="button" class="btn btn-danger remove-item">Supprimer</button>
+        </td>
+    </tr>
+`);
+
+        // Charger les catégories pour la nouvelle ligne
+        loadCategories($('#items-container').find('.category').last());
+    });
+
+
+    // Supprimer une ligne de produit
+    $('#items-container').on('click', '.remove-item', function () {
+        $(this).closest('.item-row').remove();
+        calculateTotal();
+    });
+
+    //mettre à jour le prix unitaire et la tva lors de la seleccion du produit
+    $(document).on('change', '.product', function () {
+    var selectedOption = $(this).find('option:selected');
+    var price = selectedOption.data('price');
+    var tva = selectedOption.data('tva');
+    
+    var row = $(this).closest('tr');
+    row.find('.price').val(price);
+    row.find('.tva').val(tva);
+
+    // Recalculer le total pour cette ligne
+    calculateTotalForRow(row);
+
+    });
+
+    //calcul du total pour chaque ligne
+    function calculateTotalForRow(row) {
+        var quantity = parseFloat(row.find('.quantity').val()) || 0;
+        var price = parseFloat(row.find('.price').val()) || 0;
+        var tva = parseFloat(row.find('.tva').val()) || 0;
+
+        var total = quantity * price * (1 + tva / 100);
+        row.find('.total').val(total.toFixed(2));
+    }
+
+    // Recalculer le total lors de la modification de la quantité
+    $(document).on('input', '.quantity', function () {
+        var row = $(this).closest('tr');
+        calculateTotalForRow(row);
+    });
+
+
+
+
+});
+
+
+
+
+
+
+function getInvoiceData() {
+    var invoiceData = {
+        client: $('#client').val(), // ID du client
+        items: [], // Liste des produits
+        total: parseFloat($('#total').val()) || 0 // Total général
+    };
+
+        // Récupérer les informations de chaque ligne de produit
+        $('#items-container .item-row').each(function () {
+            var row = $(this);
+            var productData = {
+                category: row.find('.category').val(), // ID de la catégorie
+                product: row.find('.product').val(), // ID du produit
+                quantity: parseFloat(row.find('.quantity').val()) || 0, // Quantité
+                price: parseFloat(row.find('.price').val()) || 0, // Prix unitaire
+                tva: parseFloat(row.find('.tva').val()) || 0, // TVA
+                total: parseFloat(row.find('.total').val()) || 0 // Total de la ligne
+            };
+
+            // Ajouter les données du produit à la liste
+            invoiceData.items.push(productData);
+        });
+
+        return invoiceData;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Gestion du clic sur le bouton "Générer une facture"
+$('#generate-invoice').click(function () {
+    var invoiceData = getInvoiceData();
+
+    // Afficher les données dans la console pour vérification
+    console.log(invoiceData);
+
+    // Envoyer les données au backend via AJAX
+    $.ajax({
+        url: '{% url "generate_invoice" %}', // Remplacez par l'URL correcte pour générer la facture
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(invoiceData),
+        success: function (response) {
+            // Traitez la réponse du backend
+            if (response.facture_id) {
+                alert('Facture générée avec succès ! ID de la facture : ' + response.facture_id);
+                // Vous pouvez rediriger vers une autre page si nécessaire
+                // window.location.href = '/factures/';
+            }
+        },
+        error: function (xhr, status, error) {
+            // Gérer les erreurs
+            var errorMessage = 'Une erreur est survenue lors de la génération de la facture. Veuillez réessayer.';
+            try {
+                var response = JSON.parse(xhr.responseText);
+                if (response.error) {
+                    errorMessage = response.error;
+                }
+            } catch (e) {
+                // Si la réponse n'est pas au format JSON ou si le parsing échoue
+                console.error('Erreur lors du parsing de la réponse JSON:', e);
+            }
+            alert(errorMessage);
+            console.error('Erreur lors de la génération de la facture:', error);
+        }
+    });
+});
+
